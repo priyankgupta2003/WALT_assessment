@@ -7,8 +7,10 @@ databases. Dialect adapters handle SQL syntax differences.
 
 ## Setup and run
 
-Python 3.12+ and [uv](https://docs.astral.sh/uv/) are required. uv creates `.venv`, installs
-the project, and manages all dependencies using the committed `uv.lock`.
+Python 3.12+ is required. Choose [uv](https://docs.astral.sh/uv/) below or follow
+[Setup and run without uv](#setup-and-run-without-uv) using Python and pip.
+uv creates `.venv`, installs the project, and manages all dependencies using the committed
+`uv.lock`.
 
 ```sh
 uv sync --locked
@@ -87,6 +89,95 @@ uv run python -m query_compiler compile \
   --contract src/query_compiler/fixtures/contract_b.json \
   --dialect duckdb
 ```
+
+### Setup and run without uv
+
+Run these commands from the project directory. On Linux, WSL, or macOS, create and activate
+a virtual environment:
+
+```sh
+python3.12 -m venv .venv
+source .venv/bin/activate
+```
+
+On Windows PowerShell, use these activation commands instead:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Install the project with DuckDB, the optional PostgreSQL driver, and development tools:
+
+```sh
+python -m pip install --upgrade pip
+python -m pip install -e ".[postgres]"
+python -m pip install "pytest>=8,<10" "ruff>=0.12,<1" "pglast>=7,<9"
+```
+
+For DuckDB-only use, replace `".[postgres]"` with `.`. pip installs the `uv_build` build
+backend automatically; the uv CLI is not required. This installation uses dependency ranges
+from `pyproject.toml`, rather than the exact versions in `uv.lock`.
+
+Run all three contracts (A, B, and C) against DuckDB:
+
+```sh
+python -m query_compiler demo --show-sql
+```
+
+To create or reuse a persistent DuckDB database:
+
+```sh
+python -m query_compiler demo --database data/assessment.duckdb --show-sql
+```
+
+Run all three contracts against PostgreSQL:
+
+```sh
+python -m query_compiler demo --dialect postgres --dsn 'postgresql://localhost/walt' --show-sql
+```
+
+PostgreSQL requires a running server and an existing database. Replace the example connection
+string with your database and authentication settings. The demo loads fixtures into temporary
+tables for its connection, as described in [PostgreSQL](#postgresql).
+
+Run the tests without a PostgreSQL server, plus lint and formatting checks:
+
+```sh
+python -m pytest
+python -m ruff check .
+python -m ruff format --check .
+```
+
+With `QUERY_COMPILER_TEST_POSTGRES_DSN` unset, the tests cover DuckDB and server-independent
+PostgreSQL checks; PostgreSQL execution tests are skipped. To run the full suite, including
+execution against both databases, set a dedicated test database connection (Linux / WSL / macOS):
+
+```sh
+export QUERY_COMPILER_TEST_POSTGRES_DSN='postgresql://localhost/walt_test'
+python -m pytest
+```
+
+In Windows PowerShell:
+
+```powershell
+$env:QUERY_COMPILER_TEST_POSTGRES_DSN = 'postgresql://localhost/walt_test'
+python -m pytest
+```
+
+The test database must already exist, and its user needs temporary-table and schema-creation
+permissions. See [Tests](#tests) for fixture isolation and cleanup details.
+
+Benchmark SQL generation for all three contracts in each dialect:
+
+```sh
+python -m query_compiler benchmark --dialect duckdb --iterations 5000 --output benchmarks/duckdb.json
+python -m query_compiler benchmark --dialect postgres --iterations 5000 --output benchmarks/postgres.json
+```
+
+Both benchmarks measure compilation only and need no database server. These commands overwrite
+the corresponding benchmark reports. For other README commands, replace `uv run python` with
+`python` (or `uv run --extra postgres python` with `python` after installing the extra).
 
 ## PostgreSQL
 
