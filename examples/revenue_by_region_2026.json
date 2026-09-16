@@ -1,0 +1,8 @@
+{
+  "metrics": [{"name": "total_revenue"}],
+  "group_by": ["region"],
+  "filters": [
+    {"field": "fiscal_year", "op": "=", "value": 2026, "model": "dim_calendar"}
+  ],
+  "totals": "grand"
+}

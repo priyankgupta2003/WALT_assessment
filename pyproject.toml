@@ -1,0 +1,30 @@
+[project]
+name = "query-contract-sql"
+version = "0.1.0"
+description = "A deterministic semantic query compiler for DuckDB and PostgreSQL"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["duckdb>=1.4,<2"]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2,<4"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.12,<1", "pglast>=7,<9"]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "query_compiler"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["postgres: integration tests requiring QUERY_COMPILER_TEST_POSTGRES_DSN"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

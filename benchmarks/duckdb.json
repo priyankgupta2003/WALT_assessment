@@ -1,0 +1,34 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "dialect": "duckdb",
+  "iterations_per_contract": 5000,
+  "warmup_per_contract": 100,
+  "units": "milliseconds",
+  "scope": "Full compile_sql call; parsed inputs; no caching, I/O, or database execution",
+  "first_call_note": "First observed per contract in this process; only A is first overall",
+  "contracts": {
+    "A": {
+      "first_call_ms": 0.193408,
+      "median_ms": 0.0636965,
+      "p95_ms": 0.083113,
+      "max_ms": 1.279438,
+      "over_10_ms": 0
+    },
+    "B": {
+      "first_call_ms": 0.163311,
+      "median_ms": 0.077796,
+      "p95_ms": 0.102595,
+      "max_ms": 0.996607,
+      "over_10_ms": 0
+    },
+    "C": {
+      "first_call_ms": 0.090023,
+      "median_ms": 0.056962,
+      "p95_ms": 0.07376,
+      "max_ms": 0.871182,
+      "over_10_ms": 0
+    }
+  }
+}
